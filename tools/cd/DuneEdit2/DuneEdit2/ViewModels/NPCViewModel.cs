@@ -17,7 +17,10 @@
 
         public NPC NPC => _npc;
 
-        public string? Name => NPCNameFinder.GetNPCName(_npc.SpriteId);
+        public string? Name => NameOverride != null ? NameOverride : _npc.Id + ": " + NPCNameFinder.GetNPCName(_npc.SpriteId);
+
+        public string? NameOverride;
+
         public int StartOffset => _npc.StartOffset;
 
         private bool _hasChanged = false;
@@ -32,9 +35,149 @@
             }
         }
 
-        /// <summary>
-        /// 1st byte
-        /// </summary>
+        public byte RoomLocation
+        {
+            get => _npc.RoomLocation;
+            set
+            {
+                _npc.RoomLocation = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(RoomLocation));
+            }
+        }
+
+        public byte TypeOfPlace
+        {
+            get => _npc.TypeOfPlace;
+            set
+            {
+                _npc.TypeOfPlace = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(TypeOfPlace));
+            }
+        }
+
+        public byte DialogueAvailable
+        {
+            get => _npc.DialogueAvailable;
+            set
+            {
+                _npc.DialogueAvailable = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(DialogueAvailable));
+            }
+        }
+
+        public byte ExactPlace
+        {
+            get => _npc.ExactPlace;
+            set
+            {
+                _npc.ExactPlace = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(ExactPlace));
+            }
+        }
+
+        public ushort DialoguePointer
+        {
+            get => _npc.DialoguePointer;
+            set
+            {
+                _npc.DialoguePointer = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(DialoguePointer));
+            }
+        }
+
+        public byte UnknownByte1
+        {
+            get => _npc.UnknownByte1;
+            set
+            {
+                _npc.UnknownByte1 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte1));
+            }
+        }
+
+        public byte UnknownByte2
+        {
+            get => _npc.UnknownByte2;
+            set
+            {
+                _npc.UnknownByte2 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte2));
+            }
+        }
+
+        public byte UnknownByte3
+        {
+            get => _npc.UnknownByte3;
+            set
+            {
+                _npc.UnknownByte3 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte3));
+            }
+        }
+
+        public byte UnknownByte4
+        {
+            get => _npc.UnknownByte4;
+            set
+            {
+                _npc.UnknownByte4 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte4));
+            }
+        }
+
+        public byte UnknownByte5
+        {
+            get => _npc.UnknownByte5;
+            set
+            {
+                _npc.UnknownByte5 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte5));
+            }
+        }
+
+        public byte UnknownByte6
+        {
+            get => _npc.UnknownByte6;
+            set
+            {
+                _npc.UnknownByte6 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte6));
+            }
+        }
+
+        public byte UnknownByte7
+        {
+            get => _npc.UnknownByte7;
+            set
+            {
+                _npc.UnknownByte7 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte7));
+            }
+        }
+
+        public byte UnknownByte8
+        {
+            get => _npc.UnknownByte8;
+            set
+            {
+                _npc.UnknownByte8 = value;
+                HasChanged = true;
+                this.RaisePropertyChanged(nameof(UnknownByte8));
+            }
+        }
+
         public byte SpriteId
         {
             get => _npc.SpriteId;
@@ -47,102 +190,55 @@
             }
         }
 
-        /// <summary>
-        /// 2nd byte
-        /// </summary>
-        public byte UnknownByte1
+        public int Status
         {
-            get => _npc.UnknownByte1;
+            get => _npc.Status;
             set
             {
-                _npc.UnknownByte1 = value;
+                _npc.Status = value;
                 HasChanged = true;
-                this.RaisePropertyChanged(nameof(UnknownByte1));
+                RaiseStatusChanged();
             }
         }
 
-        /// <summary>
-        /// 3rd byte
-        /// </summary>
-        public byte RoomLocation
+        public bool SpokenTo
         {
-            get => _npc.RoomLocation;
+            get => _npc.SpokenTo;
             set
             {
-                _npc.RoomLocation = value;
+                _npc.SpokenTo = value;
                 HasChanged = true;
-                this.RaisePropertyChanged(nameof(RoomLocation));
+                RaiseStatusChanged();
             }
         }
 
-        /// <summary>
-        /// 4th byte
-        /// </summary>
-        public byte TypeOfPlace
+        public bool IsCurrentPartyMember
         {
-            get => _npc.TypeOfPlace;
+            get => _npc.IsCurrentPartyMember;
             set
             {
-                _npc.TypeOfPlace = value;
+                _npc.IsCurrentPartyMember = value;
                 HasChanged = true;
-                this.RaisePropertyChanged(nameof(TypeOfPlace));
+                RaiseStatusChanged();
+            }
+        }
+        public bool RecruitmentDisabled
+        {
+            get => _npc.RecruitmentDisabled;
+            set
+            {
+                _npc.RecruitmentDisabled = value;
+                HasChanged = true;
+                RaiseStatusChanged();
             }
         }
 
-        /// <summary>
-        /// 5th byte (Field E)
-        /// </summary>
-        public byte DialogueAvailable
+        private void RaiseStatusChanged()
         {
-            get => _npc.DialogueAvailable;
-            set
-            {
-                _npc.DialogueAvailable = value;
-                HasChanged = true;
-                this.RaisePropertyChanged(nameof(DialogueAvailable));
-            }
-        }
-
-        /// <summary>
-        /// 6th byte
-        /// </summary>
-        public byte ExactPlace
-        {
-            get => _npc.ExactPlace;
-            set
-            {
-                _npc.ExactPlace = value;
-                HasChanged = true;
-                this.RaisePropertyChanged(nameof(ExactPlace));
-            }
-        }
-
-        /// <summary>
-        /// 7th byte
-        /// </summary>
-        public byte ForDialogue
-        {
-            get => _npc.ForDialogue;
-            set
-            {
-                _npc.ForDialogue = value;
-                HasChanged = true;
-                this.RaisePropertyChanged(nameof(ForDialogue));
-            }
-        }
-
-        /// <summary>
-        /// 8th byte
-        /// </summary>
-        public byte UnknownByte3
-        {
-            get => _npc.UnknownByte3;
-            set
-            {
-                _npc.UnknownByte3 = value;
-                HasChanged = true;
-                this.RaisePropertyChanged(nameof(UnknownByte3));
-            }
+            this.RaisePropertyChanged(nameof(Status));
+            this.RaisePropertyChanged(nameof(SpokenTo));
+            this.RaisePropertyChanged(nameof(IsCurrentPartyMember));
+            this.RaisePropertyChanged(nameof(RecruitmentDisabled));
         }
 
     }

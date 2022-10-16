@@ -80,6 +80,32 @@
 										<NumericUpDown Value="{Binding GameStage, Mode=TwoWay}" />
 										<TextBlock Text="{Binding GameStageDesc}" />
 									</StackPanel>
+                  <StackPanel Margin="5,0,0,0" Orientation="Vertical">
+                  </StackPanel>
+                  <StackPanel Margin="5,0,0,0" Orientation="Vertical">
+                    <Label>Party Member (1st slot)</Label>
+                		<ComboBox
+											Items="{Binding PartyCandidates}"
+											SelectedItem="{Binding CurrentPartyMember0, Mode=TwoWay}">
+												<ComboBox.ItemTemplate>
+													<DataTemplate DataType="{x:Type vm:NPCViewModel}">
+														<Label Content="{Binding Name}" />
+													</DataTemplate>
+												</ComboBox.ItemTemplate>
+											</ComboBox>
+                  </StackPanel>
+									<StackPanel Margin="5,0,0,0" Orientation="Vertical">
+										<Label>Party Member (2nd slot)</Label>
+                		<ComboBox
+											Items="{Binding PartyCandidates}"
+											SelectedItem="{Binding CurrentPartyMember1, Mode=TwoWay}">
+												<ComboBox.ItemTemplate>
+													<DataTemplate DataType="{x:Type vm:NPCViewModel}">
+														<Label Content="{Binding Name}" />
+													</DataTemplate>
+												</ComboBox.ItemTemplate>
+											</ComboBox>
+									</StackPanel>
 								</UniformGrid>
 							</StackPanel>
 
@@ -426,54 +452,84 @@
 				<!--  From ODRADE: https://github.com/debrouxl/odrade  -->
 				<TabItem Header="NPCs" IsEnabled="{Binding IsSaveGameLoaded}">
 					<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,*">
+						<ComboBox
+							Items="{Binding NPCs}"
+							SelectedItem="{Binding CurrentNPC, Mode=TwoWay}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate DataType="{x:Type vm:NPCViewModel}">
+									<Label Content="{Binding Name}" />
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
 						<Button
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Command="{Binding UpdateNPC}"
-                            Content="Apply Modifications"
-                            IsEnabled="{Binding CurrentNPC.HasChanged}" />
+							Grid.Row="0"
+							Grid.Column="1"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Top"
+							Command="{Binding UpdateNPC}"
+							Content="Apply Modifications"
+							IsEnabled="{Binding CurrentNPC.HasChanged}" />
+						<Grid
+							Grid.Row="1"
+							Grid.ColumnSpan="2"
+							ColumnDefinitions="*,*,*,*,*">
 						<StackPanel
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Margin="5,0,0,0"
-                            Orientation="Vertical">
-							<Label>Select NPC:</Label>
-							<ComboBox Items="{Binding NPCs}" SelectedItem="{Binding CurrentNPC, Mode=TwoWay}">
-								<ComboBox.ItemTemplate>
-									<DataTemplate DataType="{x:Type vm:NPCViewModel}">
-										<Label Content="{Binding Name}" />
-									</DataTemplate>
-								</ComboBox.ItemTemplate>
-							</ComboBox>
+							Grid.Column="0"
+							Margin="5,0,0,0"
+							Orientation="Vertical">
 							<Label>Start Offset</Label>
 							<TextBlock Text="{Binding CurrentNPC.StartOffset, StringFormat={}0x{0:x}}" />
 						</StackPanel>
 						<StackPanel
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            Margin="5,0,0,0"
-                            Orientation="Vertical">
-							<TextBlock>16 bytes long, only 8 shown for now.</TextBlock>
-							<TextBlock HorizontalAlignment="Center">From first to last byte</TextBlock>
-							<Label>Sprite ID Byte (1st byte)</Label>
-							<NumericUpDown Text="{Binding CurrentNPC.SpriteId}" />
-							<Label>Unknown Byte 1 (2nd byte)</Label>
-							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte1}" />
-							<Label>Room Location Byte (3rd byte)</Label>
+							Grid.Column="1"
+							Margin="5,0,0,0"
+							Orientation="Vertical">
+							<Label>Room Location Byte (1st byte)</Label>
 							<NumericUpDown Text="{Binding CurrentNPC.RoomLocation}" />
-							<Label>Type of Place Byte (Comes from Location Appeareance Field) (4th byte)</Label>
+							<Label>Type of Place Byte (Comes from Location Appearance Field) (2nd byte)</Label>
 							<NumericUpDown Text="{Binding CurrentNPC.TypeOfPlace}" />
-							<Label>Dialogue Available (5th byte)</Label>
+							<Label>Dialogue Available (3rd byte)</Label>
 							<NumericUpDown Text="{Binding CurrentNPC.DialogueAvailable}" />
-							<Label>Exact Place (Pointer) Byte (6th byte)</Label>
+							<Label>Exact Place (Pointer) Byte (4th byte)</Label>
 							<NumericUpDown Text="{Binding CurrentNPC.ExactPlace}" />
-							<Label>For Dialogue Byte (7th byte)</Label>
-							<NumericUpDown Text="{Binding CurrentNPC.ForDialogue}" />
-							<Label>Unknown Byte 3 (8th byte)</Label>
-							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte3}" />
+							<Label>Dialogue Function Pointer (5th &amp; 6th bytes)</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.DialoguePointer}" />
+							<Label>Unknown Byte 1</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte1}" />
+							<Label>Unknown Byte 2</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte2}" />
 						</StackPanel>
+						<StackPanel
+							Grid.Column="2"
+							Margin="5,0,0,0"
+							Orientation="Vertical">
+							<Label>Unknown Byte 3</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte3}" />
+							<Label>Unknown Byte 4</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte4}" />
+							<Label>Unknown Byte 5</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte5}" />
+							<Label>Unknown Byte 6</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte6}" />
+							<Label>Unknown Byte 7</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte7}" />
+							<Label>Unknown Byte 8</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.UnknownByte8}" />
+							<Label>Sprite ID Byte (15th byte)</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.SpriteId}" />
+						</StackPanel>
+						<StackPanel
+							Grid.Column="3"
+							Margin="5,0,0,0"
+							Orientation="Vertical">
+							<Label>Status (16th byte)</Label>
+							<CheckBox Content="Spoken To" IsChecked="{Binding CurrentNPC.SpokenTo}" />
+							<CheckBox Content="Is Current Party Member" IsChecked="{Binding CurrentNPC.IsCurrentPartyMember}" />
+							<CheckBox Content="&quot;Come With Me&quot; Disabled" IsChecked="{Binding CurrentNPC.RecruitmentDisabled}" />
+							<Label>Direct Value Edit</Label>
+							<NumericUpDown Text="{Binding CurrentNPC.Status}" />
+						  </StackPanel>
+						</Grid>
 					</Grid>
 				</TabItem>
 				<TabItem Header="Map of Dune">

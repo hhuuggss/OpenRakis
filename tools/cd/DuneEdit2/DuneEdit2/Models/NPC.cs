@@ -1,47 +1,45 @@
-﻿namespace DuneEdit2.Models
+﻿using DuneEdit2.Parsers;
+
+namespace DuneEdit2.Models
 {
     public record NPC
     {
+        public int Id { get; set; }
         public int StartOffset { get; set; }
-
-        /// <summary>
-        /// 1st byte
-        /// </summary>
-        public byte SpriteId { get; set; }
-
-        /// <summary>
-        /// 2nd byte (Field B)
-        /// </summary>
-        public byte UnknownByte1 { get; set; }
-
-        /// <summary>
-        /// 3rd byte
-        /// </summary>
         public byte RoomLocation { get; set; }
-
-        /// <summary>
-        /// 4th byte
-        /// </summary>
         public byte TypeOfPlace { get; set; }
-
-        /// <summary>
-        /// 5th byte (Field E)
-        /// </summary>
         public byte DialogueAvailable { get; set; }
-
-        /// <summary>
-        /// 6th byte
-        /// </summary>
         public byte ExactPlace { get; set; }
-
-        /// <summary>
-        /// 7th byte
-        /// </summary>
-        public byte ForDialogue { get; set; }
-
-        /// <summary>
-        /// 8th byte
-        /// </summary>
+        public ushort DialoguePointer { get; set; }
+        public byte UnknownByte1 { get; set; }
+        public byte UnknownByte2 { get; set; }
         public byte UnknownByte3 { get; set; }
+        public byte UnknownByte4 { get; set; }
+        public byte UnknownByte5 { get; set; }
+        public byte UnknownByte6 { get; set; }
+        public byte UnknownByte7 { get; set; }
+        public byte UnknownByte8 { get; set; }
+        public byte SpriteId { get; set; } 
+        public ClsBitfield? StatusBitfield { get; set; }
+        public int Status
+        {
+            get { if (StatusBitfield != null) { return StatusBitfield.Bitfield; } else { return 0; } }
+            set { if (StatusBitfield != null) { StatusBitfield.Bitfield = value; } }
+        }
+        public bool SpokenTo
+        {
+            get => StatusBitfield?.GetBit(5) != 0;
+            set => StatusBitfield?.SetBit(5, value);
+        }
+        public bool IsCurrentPartyMember
+        {
+            get => StatusBitfield?.GetBit(6) != 0;
+            set => StatusBitfield?.SetBit(6, value);
+        }
+        public bool RecruitmentDisabled
+        {
+            get => StatusBitfield?.GetBit(7) != 0;
+            set => StatusBitfield?.SetBit(7, value);
+        }
     }
 }

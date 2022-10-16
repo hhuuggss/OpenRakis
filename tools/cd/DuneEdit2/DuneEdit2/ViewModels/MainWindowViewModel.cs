@@ -364,6 +364,7 @@
             PopulateLocations(_savegameFile.GetSietches());
             PopulateNPCs(_savegameFile.GetNPCs());
             PopulateSmugglers(_savegameFile.GetSmugglers());
+            PopulatePartyCandidates();
             HasChanged = false;
         }
 
@@ -373,7 +374,6 @@
             NPCs = npcsVMs;
             if (NPCs.Any())
             {
-                NPCs = new List<NPCViewModel>(NPCs.OrderBy(x => x.Name));
                 CurrentNPC = NPCs.First();
             }
         }
@@ -488,6 +488,16 @@
             _savegameFile.UpdateContactDistance(ContactDistanceVal);
             _savegameFile.UpdateNumberOfRalliedTroops(NumberOfRalliedTroops);
             _savegameFile.UpdateGameStage(GameStage);
+            _savegameFile.UpdateParty();
+            // this is a hacky way of refreshing the NPC view,
+            // in case UpdateParty changes fields on the current NPC
+            if (CurrentNPC != null)
+            {
+                NPCViewModel prevNPC = CurrentNPC;
+                if (CurrentNPC == NPCs.First()) { CurrentNPC = NPCs.Last(); }
+                else { CurrentNPC = NPCs.First(); }
+                CurrentNPC = prevNPC;
+            }
             return Unit.Default;
         }
 
@@ -508,5 +518,63 @@
             }
             return Unit.Default;
         }
+
+        private List<NPCViewModel> _partyCandidates = new();
+
+        public List<NPCViewModel> PartyCandidates
+        {
+            get => _partyCandidates;
+            private set => this.RaiseAndSetIfChanged(ref _partyCandidates, value);
+        }
+
+        private NPCViewModel? _currentPartyMember0;
+
+        public NPCViewModel? CurrentPartyMember0
+        {
+            get => _currentPartyMember0;
+            set
+            {
+                if (_currentPartyMember0 != value)
+                {
+                    if (value != null) { _savegameFile.Generals.PartyMember0 = (byte)value.NPC.Id; }
+                    this.RaiseAndSetIfChanged(ref _currentPartyMember0, value);
+                    HasChanged = true;
+                }
+            }
+        }
+
+        private NPCViewModel? _currentPartyMember1;
+
+        public NPCViewModel? CurrentPartyMember1
+        {
+            get => _currentPartyMember1;
+            set
+            {
+                if (_currentPartyMember1 != value)
+                {
+                    if (value != null) { _savegameFile.Generals.PartyMember1 = (byte)value.NPC.Id; }
+                    this.RaiseAndSetIfChanged(ref _currentPartyMember1, value);
+                    HasChanged = true;
+                }
+            }
+        }
+
+        private NPC? _nullNPC;
+        private NPCViewModel? _nullNPCVM;
+
+        private void PopulatePartyCandidates()
+        {
+            if (_nullNPC == null || _nullNPCVM == null)
+            {
+                _nullNPC = new() { Id = 255 };
+                _nullNPCVM = new(_nullNPC) { NameOverride = "None" };
+            }
+
+            PartyCandidates = new List<NPCViewModel>(NPCs.ToList()){_nullNPCVM};
+
+            CurrentPartyMember0 = PartyCandidates.FirstOrDefault(x => x.NPC.Id == _savegameFile.Generals.PartyMember0);
+            CurrentPartyMember1 = PartyCandidates.FirstOrDefault(x => x.NPC.Id == _savegameFile.Generals.PartyMember1);
+        }
+
     }
 }

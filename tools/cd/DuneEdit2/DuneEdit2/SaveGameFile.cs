@@ -7,6 +7,7 @@
     using DuneEdit2.Enums;
     using DuneEdit2.Models;
     using DuneEdit2.Parsers;
+    using Microsoft.VisualBasic;
 
     public class SaveGameFile
     {
@@ -14,8 +15,7 @@
         private const int SmugglerSize = 14;
         private const int TroopSize = 28;
         private const int SmugglerPadding = 3;
-        private const int NPCSize = 8;
-        private const int NPCPadding = 8;
+        private const int NPCSize = 16;
 
         private readonly string _fileName = "";
 
@@ -189,18 +189,27 @@
             var npcs = new List<NPC>();
             for (int i = 0; i < 16; i++)
             {
-                int itemPos = _offsets.NPCs + i * (NPCSize + NPCPadding);
+                int itemPos = _offsets.NPCs + i * NPCSize;
                 var npc = new NPC()
                 {
+                    Id = i,
                     StartOffset = itemPos,
-                    SpriteId = data[itemPos],
-                    UnknownByte1 = data[itemPos + 1],
-                    RoomLocation = data[itemPos + 2],
-                    TypeOfPlace = data[itemPos + 3],
-                    DialogueAvailable = data[itemPos + 4],
-                    ExactPlace = data[itemPos + 5],
-                    ForDialogue = data[itemPos + 6],
-                    UnknownByte3 = data[itemPos + 7],
+                    RoomLocation = data[itemPos],
+                    TypeOfPlace = data[itemPos + 1],
+                    DialogueAvailable = data[itemPos + 2],
+                    ExactPlace = data[itemPos + 3],
+                    DialoguePointer = (ushort)(data[itemPos + 4] + (data[itemPos + 5] << 8)),
+                    UnknownByte1 = data[itemPos + 6],
+                    UnknownByte2 = data[itemPos + 7],
+                    UnknownByte3 = data[itemPos + 8],
+                    UnknownByte4 = data[itemPos + 9],
+                    UnknownByte5 = data[itemPos + 10],
+                    UnknownByte6 = data[itemPos + 11],
+                    UnknownByte7 = data[itemPos + 12],
+                    UnknownByte8 = data[itemPos + 13],
+                    SpriteId = data[itemPos + 14],
+                    StatusBitfield = new ClsBitfield(data[itemPos + 15]),
+                    Status = data[itemPos + 15],
                 };
                 npcs.Add(npc);
             }
@@ -492,14 +501,48 @@
         internal void UpdateNPC(NPC npc)
         {
             int startOffset = npc.StartOffset;
-            _uncompressedData[startOffset] = npc.SpriteId;
-            _uncompressedData[startOffset + 1] = npc.UnknownByte1;
-            _uncompressedData[startOffset + 2] = npc.RoomLocation;
-            _uncompressedData[startOffset + 3] = npc.TypeOfPlace;
-            _uncompressedData[startOffset + 4] = npc.DialogueAvailable;
-            _uncompressedData[startOffset + 5] = npc.ExactPlace;
-            _uncompressedData[startOffset + 6] = npc.ForDialogue;
-            _uncompressedData[startOffset + 7] = npc.UnknownByte3;
+            _uncompressedData[startOffset] = npc.RoomLocation;
+            _uncompressedData[startOffset + 1] = npc.TypeOfPlace;
+            _uncompressedData[startOffset + 2] = npc.DialogueAvailable;
+            _uncompressedData[startOffset + 3] = npc.ExactPlace;
+            _uncompressedData[startOffset + 4] = (byte)npc.DialoguePointer;
+            _uncompressedData[startOffset + 5] = (byte)(npc.DialoguePointer >> 8);
+            _uncompressedData[startOffset + 6] = npc.UnknownByte1;
+            _uncompressedData[startOffset + 7] = npc.UnknownByte2;
+            _uncompressedData[startOffset + 8] = npc.UnknownByte3;
+            _uncompressedData[startOffset + 9] = npc.UnknownByte4;
+            _uncompressedData[startOffset + 10] = npc.UnknownByte5;
+            _uncompressedData[startOffset + 11] = npc.UnknownByte6;
+            _uncompressedData[startOffset + 12] = npc.UnknownByte7;
+            _uncompressedData[startOffset + 13] = npc.UnknownByte8;
+            _uncompressedData[startOffset + 14] = npc.SpriteId;
+            _uncompressedData[startOffset + 15] = (byte)npc.Status;
+        }
+
+        internal void UpdateParty()
+        {
+            foreach (NPC npc in _npcs)
+            {
+                int startOffset = npc.StartOffset;
+                if (npc.Id == Generals.PartyMember0 || npc.Id == Generals.PartyMember1)
+                {
+                    npc.RoomLocation = _generals.LocRoom;
+                    npc.TypeOfPlace = _generals.LocScene;
+                    npc.DialogueAvailable = _generals.LocDistance;
+                    npc.ExactPlace = _generals.LocIndex;
+                    npc.IsCurrentPartyMember = true;
+                    UpdateNPC(npc);
+                }
+                else if (npc.IsCurrentPartyMember)
+                {
+                    npc.IsCurrentPartyMember = false;
+                    UpdateNPC(npc);
+                }
+            }
+            _uncompressedData[_offsets.PartyMembers] = Generals.PartyMember0;
+            _uncompressedData[_offsets.PartyMembers + 1] = Generals.PartyMember1;
+            _uncompressedData[_offsets.TimeCounters + 0x10] = (byte)Generals.NPCsHidden.Bitfield;
+            _uncompressedData[_offsets.TimeCounters + 0x11] = (byte)(Generals.NPCsHidden.Bitfield >> 8);
         }
 
         internal void UpdateGameStage(byte gameStageValue)

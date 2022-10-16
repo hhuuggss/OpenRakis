@@ -20,6 +20,16 @@ namespace DuneEdit2.Models
         private readonly byte[] _spice = new byte[] { 0 };
         private readonly byte _numberOfRalliedTroops;
 
+        // this is RoomLocation/TypeOfPlace/DialogueAvailable/ExactPlace on NPC
+        // the player location is also stored elsewhere, so changing these might not properly set Paul's location
+        private readonly byte _locRoom;
+        private readonly byte _locScene;
+        private readonly byte _locDistance;
+        private readonly byte _locIndex;
+
+        private readonly byte[] _partyMembers = new byte[] { 0, 0 };
+        private readonly ClsBitfield _NPCsHidden = new();
+
         public Generals()
         {
         }
@@ -40,6 +50,16 @@ namespace DuneEdit2.Models
                 uncompressedData[offsets.DateTime + 1]
             };
             _charisma = uncompressedData[offsets.Charisma];
+
+            _locRoom = uncompressedData[offsets.TimeCounters + 0x04];
+            _locScene = uncompressedData[offsets.TimeCounters + 0x05];
+            _locDistance = uncompressedData[offsets.TimeCounters + 0x06];
+            _locIndex = uncompressedData[offsets.TimeCounters + 0x07];
+
+            _partyMembers[0] = uncompressedData[offsets.PartyMembers];
+            _partyMembers[1] = uncompressedData[offsets.PartyMembers + 1];
+            _NPCsHidden = new ClsBitfield(uncompressedData[offsets.TimeCounters + 0x10] + (uncompressedData[offsets.TimeCounters + 0x11] << 8));
+
         }
 
         public static string DateGUI => "??";
@@ -93,5 +113,36 @@ namespace DuneEdit2.Models
         }
 
         public string GetGameStageDesc() => GameStageFinder.FindStage(_gameStage);
+
+        public byte LocRoom => _locRoom;
+        public byte LocScene => _locScene;
+        public byte LocDistance => _locDistance;
+        public byte LocIndex => _locIndex;
+
+        private void SetPartyMember(byte id, int slot = 0)
+        {
+            if (_partyMembers[slot] <= 15)
+            {
+                _NPCsHidden.SetBit(id, false);
+            }
+            if (id <= 15)
+            {
+                _NPCsHidden.SetBit(id);
+                _partyMembers[slot] = id;
+            }
+            else { _partyMembers[slot] = 255; }
+        }
+
+        public byte PartyMember0
+        {
+            get => _partyMembers[0];
+            set => SetPartyMember(value);
+        }
+        public byte PartyMember1
+        {
+            get => _partyMembers[1];
+            set => SetPartyMember(value, 1);
+        }
+        public ClsBitfield NPCsHidden => _NPCsHidden;
     }
 }
